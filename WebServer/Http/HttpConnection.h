@@ -19,7 +19,10 @@ namespace net
 namespace Http
 {
 
-  class HttpConnection: public Base::noncopyable
+  class HttpData;
+
+  class HttpConnection: public Base::noncopyable,
+                        public std::enable_shared_from_this<HttpConnection>
   {
     using CallBack = std::function<void()>;
 
@@ -30,11 +33,9 @@ namespace Http
     // setCloseCallBack 只能由HttpServer调用
     void setCloseCallBack(const CallBack& cb) { closeCallBack_ = cb; }
     // handleClose由HttpData调用
-    void handleClose();
+    void handleClose() { closeCallBack_(); }
 
-    void handleRead();
-    void handleWrite();
-    void handleError();
+    // void handleError()? 
 
     // 新连接建立时由HttpServer调用,每个连接只能调用一次
     void connectionEstablish();
@@ -50,6 +51,7 @@ namespace Http
     net::EventLoop* loop_;
     // HttpServer的ConnectionMap以sockFd_为键
     int sockFd_;
+    std::shared_ptr<HttpData> httpData_;
     std::unique_ptr<net::Channel> channel_;
 
     // closeCallBack必须为Server注册的回调函数

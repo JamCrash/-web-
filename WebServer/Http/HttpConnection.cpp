@@ -1,4 +1,5 @@
 
+#include "HttpData.h"
 #include "HttpConnection.h"
 
 #include "../net/EventLoop.h"
@@ -14,15 +15,13 @@ namespace Http
   HttpConnection::HttpConnection(net::EventLoop* loop, int sockFd)
   : loop_(loop),
     sockFd_(sockFd),
+    httpData_(new HttpData(shared_from_this(), sockFd)),
     channel_(new net::Channel(loop, sockFd))
   {
     channel_->setReadCallBack(
-      std::bind(&HttpConnection::handleRead, this));
+      std::bind(&HttpData::handleRead, httpData_));
     channel_->setWriteCallBack(
-      std::bind(&HttpConnection::handleWrite, this));
-    channel_->setErrorCallBack(
-      std::bind(&HttpConnection::handleError, this));
-    channel_->setCloseCallBack(closeCallBack_);
+      std::bind(&HttpData::handleWrite, httpData_));
   }
 
   HttpConnection::~HttpConnection()
@@ -31,21 +30,6 @@ namespace Http
     ::close(sockFd_);
   }
  
-  void HttpConnection::handleRead()
-  {
-    
-  }
-
-  void HttpConnection::handleWrite()
-  {
-    
-  }
-
-  void HttpConnection::handleError()
-  {
-    
-  }
-
   void HttpConnection::connectionEstablish()
   {
     LOG << "New connection established with socket = " << sockFd_;

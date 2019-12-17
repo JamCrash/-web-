@@ -61,7 +61,7 @@ namespace Utility
       n = ::write(fd, ptr, nLeft);
       if(n < 0)
       {
-        if(errno == EAGAIN)
+        if(errno == EAGAIN || errno == EWOULDBLOCK)
           break;
         else if(errno == EINTR)
           continue;

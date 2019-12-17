@@ -35,6 +35,15 @@ namespace Http
     PARSE_HEADER_ERROR
   };
 
+  enum Parse_Header_State
+  {
+    H_START,
+    H_KEY,
+    H_COLON,
+    H_VALUE_START,
+    H_VALUE
+  };
+
 /*   enum ConnectionState
   {
     H_CONNECTED, H_DISCONNECTED
@@ -42,7 +51,7 @@ namespace Http
  */
   enum AnalysisState
   {
-    H_ANALYSIS_SUCCESS, H_ANALYSIS_ERROR
+    ANALYSIS_SUCCESS, ANALYSIS_ERROR
   };
 
   // 支持的请求方法
@@ -59,7 +68,7 @@ namespace Http
     using CallBack = std::function<void()>;
 
   public:
-    HttpData(HttpConnectionPtr& connection, int sockFd);
+    HttpData(HttpConnectionPtr connection, int sockFd);
     ~HttpData();
 
     void handleRead();
@@ -74,7 +83,7 @@ namespace Http
     // analysis向writeBuffer_中写入正确响应后的数据
     AnalysisState analysis();
 
-    void handleError(char* errorCode, char* errorMsg);
+    void handleError(std::string errorCode, std::string errorMsg);
 
     /* // 调用handleClose使服务端清除本次连接信息,并断开本次连接
     void handleClose()
@@ -84,12 +93,13 @@ namespace Http
     } */
 
   private:
-    int sockFd_;
     HttpConnectionPtr connection_;
+    int sockFd_;
     bool error_;
 
     //ConnectionState connectionState_;
     ProcessState processState_;
+    Parse_Header_State headerState_;
 
     std::string readBuffer_;
     std::string writeBuffer_;
