@@ -15,9 +15,10 @@ namespace Http
   HttpConnection::HttpConnection(net::EventLoop* loop, int sockFd)
   : loop_(loop),
     sockFd_(sockFd),
-    httpData_(new HttpData(shared_from_this(), sockFd)),
+    httpData_(new HttpData(this, sockFd)),
     channel_(new net::Channel(loop, sockFd))
   {
+    LOG << "dubug";
     channel_->setReadCallBack(
       std::bind(&HttpData::handleRead, httpData_));
     channel_->setWriteCallBack(

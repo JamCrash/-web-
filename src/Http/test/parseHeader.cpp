@@ -23,79 +23,87 @@ enum H_State
 
 };
 
-map<string, string> m;
-H_State state = H_START;
+map<string, string> headers_;
+H_State headerState_ = H_START;
 
-HeaderState parseHeader(string& parseStr)
-{
-  size_t end = parseStr.find("\r\n\r\n");
-  if(end == string::npos)
-    return HeaderState::PARSE_HEADER_AGAIN;
-
-  end += 2;
-  string&& str = parseStr.substr(0, end);
-  size_t key_start, value_start;
-  string key, value;
-  for(int i=0;i<str.size();++i)
+  HeaderState parseHeader(string& readBuffer_)
   {
-    switch(state)
+    size_t end = readBuffer_.find("\r\n\r\n");
+    /* if(end == std::string::npos)
+      return HeaderState::PARSE_HEADER_AGAIN; */
+    // 暂时假定每次都读满请求数据, 则以下断言成立
+    assert(end != std::string::npos);
+
+    end+=4;
+
+    size_t key_start, value_start;
+    std::string key, value;
+    for(int i = 0; i < end; ++i)
     {
-      case H_START:
+      switch(headerState_)
       {
-        if(str[i] == '\n' || str[i] == '\r') break;
-        key_start = i;
-        state = H_KEY;
-        break;
-      }
-      case H_KEY:
-      {
-        if(str[i] == '\n' || str[i] == '\r') 
-          return PARSE_HEADER_ERROR;
-        if(str[i] != ':') break;
-        if(i == key_start) 
-          return PARSE_HEADER_ERROR;
-        key = str.substr(key_start, i-key_start);
-        state = H_COLON;
-        break;
-      }
-      case H_COLON:
-      {
-        if(str[i] != ' ') 
-          return PARSE_HEADER_ERROR;
-        state = H_VALUE_START;
-        break;
-      }
-      case H_VALUE_START:
-      {
-        if(str[i] == ' ' || str[i] == '\r' || str[i] == '\n')
-          return PARSE_HEADER_ERROR;
-        value_start = i;
-        state = H_VALUE;
-        break;
-      }
-      case H_VALUE:
-      {
-        if(str[i] == ' ' || str[i] == '\n')
-          return PARSE_HEADER_ERROR;
-        if(str[i] == '\r')
+        case H_START:
         {
-          value = str.substr(value_start, i - value_start);
-          m[key] = value;
-          state = H_START;
+          if(readBuffer_[i] == '\n' || readBuffer_[i] == '\r') break;
+          key_start = i;
+          headerState_ = H_KEY;
+          break;
         }
-        break;
+        case H_KEY:
+        {
+          if(readBuffer_[i] == '\n' || readBuffer_[i] == '\r') 
+            return PARSE_HEADER_ERROR;
+          if(readBuffer_[i] != ':') break;
+          if(i == key_start) 
+            return PARSE_HEADER_ERROR;
+          key = readBuffer_.substr(key_start, i-key_start);
+          headerState_ = H_COLON;
+          break;
+        }
+        case H_COLON:
+        {
+          if(readBuffer_[i] != ' ') 
+            return PARSE_HEADER_ERROR;
+          headerState_ = H_VALUE_START;
+          break;
+        }
+        case H_VALUE_START:
+        {
+          if(readBuffer_[i] == ' ' || readBuffer_[i] == '\r' || readBuffer_[i] == '\n')
+            return PARSE_HEADER_ERROR;
+          value_start = i;
+          headerState_ = H_VALUE;
+          break;
+        }
+        case H_VALUE:
+        {
+          if(readBuffer_[i] == '\n')
+            return PARSE_HEADER_ERROR;
+          if(readBuffer_[i] == '\r')
+          {
+            value = readBuffer_.substr(value_start, i - value_start);
+            headers_[key] = value;
+            headerState_ = H_START;
+          }
+          break;
+        }
+        default:
+          return PARSE_HEADER_ERROR;
       }
-      default:
-        return PARSE_HEADER_ERROR;
     }
+    assert(headerState_ == H_START);
+    return PARSE_HEADER_SUCCESS;
   }
-  assert(state == H_START);
-  return PARSE_HEADER_SUCCESS;
-}
 
 int main()
 {
-  string test = "key1: han\r\nkey2: bao\r\nkey3: yu\r\n\r\n";
+  string test("Host: 127.0.0.1:3000\r\n\
+User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:71.0) Gecko/20100101 Firefox/71.0\r\n\
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n\
+Accept-Language: en-US,en;q=0.5\r\n\
+Accept-Encoding: gzip, deflate\r\n\
+Connection: keep-alive\r\n\
+Upgrade-Insecure-Requests: 1\r\n\r\n1");
   HeaderState flag = parseHeader(test);
   switch (flag)
   {
@@ -109,7 +117,7 @@ int main()
       cout << "success" << endl;
       break;
   }
-  assert(m["key1"] == "han");
-  assert(m["key2"] == "bao");
-  assert(m["key3"] == "yu");
+  for(auto p: headers_)
+    cout << p.first << "--->>>" << p.second << endl;
+  
 }

@@ -6,5 +6,8 @@ HttpConnection.o: HttpConnection.cpp
 
 HttpData.o: HttpData.cpp
 	g++ -c $^ -o $@
+
+HttpServer.o: HttpServer.cpp
+	g++ -c $^ -o $@
 	
-all: HttpData.o HttpConnection.o
+all: HttpData.o HttpConnection.o HttpServer.o

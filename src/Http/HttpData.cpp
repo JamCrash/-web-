@@ -25,7 +25,7 @@ namespace Http
     {"default", "text/html"}
   };
 
-  HttpData::HttpData(HttpConnectionPtr connection, int sockFd)
+  HttpData::HttpData(HttpConnection* connection, int sockFd)
   : connection_(connection), 
     sockFd_(sockFd),
     //connectionState_(ConnectionState::H_CONNECTED),
@@ -48,8 +48,11 @@ namespace Http
     do 
     {
       bool readFinish_ = false;
-
+      LOG << "in handle Read";
       readSum = Utility::readn(sockFd_, readBuffer_, readFinish_);
+      
+      LOG << "readSum = " << readSum;
+
       if(readSum < 0)
       {
         perror("read socket error");
@@ -78,6 +81,9 @@ namespace Http
         }
         processState_ = ProcessState::STATE_PARSE_HEADERS;
       }
+
+      LOG << readBuffer_;
+
       if(processState_ == ProcessState::STATE_PARSE_HEADERS)
       {
         HeaderState flag = parseHeader();
@@ -148,7 +154,7 @@ namespace Http
     body_buff += "<html><title>哎~出错了</title>";
     body_buff += "<body bgcolor=\"ffffff\">";
     body_buff += errorCode + errorMsg;
-    body_buff += "<hr><em> LinYa's Web Server</em>\n</body></html>";
+    body_buff += "<hr><em> Hby's Linux Web Server</em>\n</body></html>";
 
     header_buff += "HTTP/1.1 " + errorCode + errorMsg + "\r\n";
     header_buff += "Content-Type: text/html\r\n";
@@ -228,7 +234,7 @@ namespace Http
     // 暂时假定每次都读满请求数据, 则以下断言成立
     assert(end != std::string::npos);
 
-    end++;
+    end+=4;
 
     size_t key_start, value_start;
     std::string key, value;
@@ -271,7 +277,7 @@ namespace Http
         }
         case H_VALUE:
         {
-          if(readBuffer_[i] == ' ' || readBuffer_[i] == '\n')
+          if(readBuffer_[i] == '\n')
             return PARSE_HEADER_ERROR;
           if(readBuffer_[i] == '\r')
           {
@@ -297,13 +303,13 @@ namespace Http
     std::string filetype;
     if(dot == std::string::npos)
     {
-      filetype = headers_["defualt"];
+      filetype = mimeType_["defualt"];
       filename_ += ".html";
     }
     else
     {
-      auto it = headers_.find(filename_.substr(dot));
-      if(it == headers_.end())
+      auto it = mimeType_.find(filename_.substr(dot));
+      if(it == mimeType_.end())
       {
         handleError("404", "Not Found");
         return ANALYSIS_ERROR;

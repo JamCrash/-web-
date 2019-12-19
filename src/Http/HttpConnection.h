@@ -1,6 +1,6 @@
 
-#ifndef _HTTPCONNECTION_H
-#define _HTTPCONNECTION_H
+#ifndef _HTTP_CONNECTION_H
+#define _HTTP_CONNECTION_H
 
 #include "../base/noncopyable.h"
 
@@ -35,7 +35,7 @@ namespace Http
     // handleClose由HttpData调用
     void handleClose() { closeCallBack_(); }
 
-    // void handleError()? 
+    // void handleError()?
 
     // 新连接建立时由HttpServer调用,每个连接只能调用一次
     void connectionEstablish();
@@ -64,4 +64,4 @@ namespace Http
 
 }
 
-#endif  // _HTTPCONNECTION_H
+#endif  // _HTTP_CONNECTION_H

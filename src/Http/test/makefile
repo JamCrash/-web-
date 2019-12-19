@@ -1,13 +1,10 @@
 
-ReactorPath := ../../net/
-Reactor := $(ReactorPath)EventLoop.o 	\
-					 $(ReactorPATH)Channel.o \
-					 $(ReactorPATH)EPoller.o \
-					 ../../base/Thread.o
+#ReactorPath := ../../net/
+Reactor := ../../net/EventLoop.o ../../net/EPoller.o ../../net/Channel.o	\
+					../../base/Thread.o
 
-testConnection: testConnection.cpp ../HttpConnection.o 	\
-								../../net/EventLoop.o ../../net/Channel.o 	\
-								../../net/EPoller.o ../../base/Thread.o
+testConnection: testConnection.cpp ../HttpConnection.o 	../HttpData.o \
+								$(Reactor)
 	g++ $^ -o $@ 
 
 client: client.cpp 
@@ -24,4 +21,7 @@ analysis: analysis.cpp
 	
 Server: Server.cpp
 	g++ $(Reactor) $^ ../*.o -o $@ -lpthread
+
+testServer: testServer.cpp
+	g++ $(Reactor) $^ ../HttpServer.o -o $@ -lpthread
 	

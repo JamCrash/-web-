@@ -6,13 +6,17 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <strings.h>
+#include <memory>
+#include <functional>
 
+using namespace std;
 using namespace net;
 using namespace Http;
 
 int main()
 {
   int fd = socket(AF_INET, SOCK_STREAM, 0);
+  printf("listen fd = %d\n", fd);
   struct sockaddr_in serverAddr;
   bzero(&serverAddr, sizeof serverAddr);
   serverAddr.sin_family = AF_INET;
@@ -23,8 +27,9 @@ int main()
   int infd = accept(fd, NULL, NULL);
   printf("infd=%d\n", infd);
   EventLoop loop;
-  HttpConnection connection(&loop, infd);
-  connection.setCloseCallBack([&connection]{ connection.connectionDestroy(); });
-  connection.connectionEstablish();
+  HttpConnection conn(&loop, infd);
+  //shared_ptr<HttpConnection> connection(new HttpConnection(&loop, infd));
+  //connection->setCloseCallBack(bind(&HttpConnection::connectionDestroy, connection));
+  //connection->connectionEstablish();
   loop.loop();
 }

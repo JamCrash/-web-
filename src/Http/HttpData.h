@@ -1,6 +1,6 @@
 
-#ifndef _HTTPDATA_H
-#define _HTTPDATA_H
+#ifndef _HTTP_DATA_H
+#define _HTTP_DATA_H
 
 #include "../base/noncopyable.h"
 
@@ -64,11 +64,10 @@ namespace Http
 
   class HttpData: public Base::noncopyable
   {
-    using HttpConnectionPtr = std::shared_ptr<HttpConnection>;
     using CallBack = std::function<void()>;
 
   public:
-    HttpData(HttpConnectionPtr connection, int sockFd);
+    HttpData(HttpConnection* connection, int sockFd);
     ~HttpData();
 
     void handleRead();
@@ -93,7 +92,7 @@ namespace Http
     } */
 
   private:
-    HttpConnectionPtr connection_;
+    HttpConnection* connection_;
     int sockFd_;
     bool error_;
 
@@ -122,4 +121,4 @@ namespace Http
 
 }
 
-#endif  // _HTTPDATA_H
+#endif  // _HTTP_DATA_H
