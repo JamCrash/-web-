@@ -3,6 +3,8 @@
 #define _EVENTLOOP_THREAD_H
 
 #include "../base/noncopyable.h"
+#include "../base/Mutex.h"
+#include "../base/Condition.h"
 
 #include <memory>
 
@@ -25,9 +27,16 @@ namespace net
     EventLoopThread();
     ~EventLoopThread();
 
-    EventLoop* getLoop() const { return &loop_; }
+    EventLoop* startLoop();
+
   private:
-    EventLoop loop_;
+    void start();
+
+  private:
+    EventLoop* loop_;
+    std::unique_ptr<Base::ThreadDef::Thread> thread_;
+    Base::MutexLock mutex_;
+    Base::Condition cond_;
   };
 
 }
