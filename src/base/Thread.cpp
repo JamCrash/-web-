@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 #include <cassert>
-#include <functional>
 
 namespace Base
 {
@@ -46,7 +45,7 @@ namespace
 {
   class ThreadData: public Base::noncopyable
   {
-    using Func = void(*)(void);
+    using Func = std::function<void()>;
 
   public:
     ThreadData(pid_t* threadId, const Func& func)
@@ -80,7 +79,7 @@ namespace
   }
 } // static namespace 
 
-  Thread::Thread(const Func& func)
+  Thread::Thread(const Func func)
   : func_(func),
     joined_(false),
     started_(false),
@@ -102,8 +101,8 @@ namespace
   {
     assert(!started_);
 
-    ThreadData* data_ = new ThreadData(threadId_, func_);
-    if(pthread_create(&tid_, NULL, entrance, static_cast<void*>(data_)) < 0)
+    ThreadData* data = new ThreadData(threadId_, func_);
+    if(pthread_create(&tid_, NULL, entrance, static_cast<void*>(data)) < 0)
     {
       LOG << "create new thread failed";
       abort();
