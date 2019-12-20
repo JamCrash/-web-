@@ -3,6 +3,8 @@
 Reactor := ../../net/EventLoop.o ../../net/EPoller.o ../../net/Channel.o	\
 					../../base/Thread.o
 
+Http := ../HttpConnection.o ../HttpData.o ../HttpServer.o
+
 testConnection: testConnection.cpp ../HttpConnection.o 	../HttpData.o \
 								$(Reactor)
 	g++ $^ -o $@ 
@@ -23,5 +25,5 @@ Server: Server.cpp
 	g++ $(Reactor) $^ ../*.o -o $@ -lpthread
 
 testServer: testServer.cpp
-	g++ $(Reactor) $^ ../HttpServer.o -o $@ -lpthread
+	g++ $(Reactor) $^ $(Http) -o $@ -lpthread
 	

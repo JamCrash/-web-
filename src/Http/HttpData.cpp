@@ -82,8 +82,6 @@ namespace Http
         processState_ = ProcessState::STATE_PARSE_HEADERS;
       }
 
-      LOG << readBuffer_;
-
       if(processState_ == ProcessState::STATE_PARSE_HEADERS)
       {
         HeaderState flag = parseHeader();

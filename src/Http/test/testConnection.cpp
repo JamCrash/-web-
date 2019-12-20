@@ -20,6 +20,7 @@ void f(int fd)
   EventLoop loop;
   g_loop = &loop;
   HttpConnection connection(&loop, fd);
+  //connection.setCloseCallBack([])
   connection.connectionEstablish();
   loop.loop();
 }

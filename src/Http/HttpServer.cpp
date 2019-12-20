@@ -10,9 +10,12 @@
 #include <unistd.h>
 #include <memory>
 #include <cassert>
+#include <functional>
 
 namespace Http
 {
+
+  using std::placeholders::_1;
 
   HttpServer::HttpServer(net::EventLoop* loop, uint16_t port)
   : loop_(loop),
@@ -33,8 +36,7 @@ namespace Http
 
   HttpServer::~HttpServer()
   {
-      // TODO
-      // close the listen socket file descriptor
+      //TODO
   }
 
   void HttpServer::start()
@@ -53,13 +55,27 @@ namespace Http
     int infd;
     while((infd = Sockets::accept_sockets(acceptFd_)) > 0)
     {
-      //LOG << "new connection referenced to " << infd;
+      LOG << "new connection referenced to " << infd;
+
+      Sockets::set_nonblock(infd);
+      HttpConnectionPtr conn(new HttpConnection(loop_, infd));
+      connections_[infd] = conn;
+      conn->setCloseCallBack(
+        std::bind(&HttpServer::handleDisconnecting, this, _1));
+      conn->connectionEstablish();
     }
   }
 
-  void HttpServer::handleDisconnecting(int socketFd)
+  void HttpServer::handleDisconnecting(int sockFd)
   {
-    
+    auto it = connections_.find(sockFd);
+    assert(it != connections_.end());
+
+    HttpConnectionPtr conn = it->second;
+    LOG << "ready to remove connection with socket " << sockFd;
+    connections_.erase(it);
+    loop_->queueInLoop(
+      std::bind(&HttpConnection::connectionDestroy, conn));
   }
 
 }

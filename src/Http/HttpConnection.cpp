@@ -18,7 +18,6 @@ namespace Http
     httpData_(new HttpData(this, sockFd)),
     channel_(new net::Channel(loop, sockFd))
   {
-    LOG << "dubug";
     channel_->setReadCallBack(
       std::bind(&HttpData::handleRead, httpData_));
     channel_->setWriteCallBack(

@@ -24,16 +24,16 @@ namespace Http
   class HttpConnection: public Base::noncopyable,
                         public std::enable_shared_from_this<HttpConnection>
   {
-    using CallBack = std::function<void()>;
+    using CloseCallBack = std::function<void(int)>;
 
   public:
     HttpConnection(net::EventLoop* loop, int sockFd);
     ~HttpConnection();
 
     // setCloseCallBack 只能由HttpServer调用
-    void setCloseCallBack(const CallBack& cb) { closeCallBack_ = cb; }
+    void setCloseCallBack(const CloseCallBack& cb) { closeCallBack_ = cb; }
     // handleClose由HttpData调用
-    void handleClose() { closeCallBack_(); }
+    void handleClose() { closeCallBack_(sockFd_); }
 
     // void handleError()?
 
@@ -56,7 +56,7 @@ namespace Http
 
     // closeCallBack必须为Server注册的回调函数
     // closeCallBack使Server清除本次连接信息
-    CallBack closeCallBack_;
+    CloseCallBack closeCallBack_;
 
     // FOR TEST
     std::string buffer;

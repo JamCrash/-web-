@@ -10,4 +10,4 @@ HttpData.o: HttpData.cpp
 HttpServer.o: HttpServer.cpp
 	g++ -c $^ -o $@
 	
-all: HttpData.o HttpConnection.o HttpServer.o
+all: HttpData.o HttpConnection.o HttpServer.o 
