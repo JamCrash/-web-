@@ -5,6 +5,7 @@
 #include "noncopyable.h"
 
 #include <pthread.h>
+#include <functional>
 
 namespace Base 
 {
@@ -31,9 +32,10 @@ namespace ThreadDef
 
   class Thread: public noncopyable 
   {
-    using Func = void(*)(void);
+    using Func = std::function<void()>;
+
   public:
-    Thread(const Func& func);
+    Thread(const Func func);
     ~Thread();
 
     void start();
