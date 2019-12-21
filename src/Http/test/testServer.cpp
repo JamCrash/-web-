@@ -8,7 +8,7 @@ using namespace Http;
 int main()
 {
   EventLoop loop;
-  HttpServer server(&loop, 3000);
+  HttpServer server(&loop, 3000, 10);
   server.start();
   loop.loop();
 }

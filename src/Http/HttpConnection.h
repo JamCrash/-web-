@@ -42,10 +42,13 @@ namespace Http
     // 连接断开时由HttpServer调用,每个连接只能调用一次
     void connectionDestroy();
 
+    // 若flag为真,则监听相应事件
     // 重新注册写事件
-    void updateWrite();
+    void updateWrite(bool flag);
     // 重新注册读事件
-    void updateRead();
+    void updateRead(bool flag);
+
+    net::EventLoop* getLoop() const { return loop_; }
 
   private:
     net::EventLoop* loop_;

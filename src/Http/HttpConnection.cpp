@@ -42,15 +42,31 @@ namespace Http
     channel_->setNonEvent();
   }
   
-  void HttpConnection::updateRead()
+  void HttpConnection::updateRead(bool flag)
   {
-    if(!(channel_->isEnableReading()))
-      channel_->enableReading();
+    if(flag) 
+    {
+      if(!(channel_->isEnableReading()))
+        channel_->enableReading();
+    }
+    else 
+    {
+      if(channel_->isEnableReading())
+        channel_->unableReading();
+    }
   }
 
-  void HttpConnection::updateWrite()
+  void HttpConnection::updateWrite(bool flag)
   {
-    if(!(channel_->isEnableWriting()))
-      channel_->enableWriting();
+    if(flag)
+    {
+      if(!(channel_->isEnableWriting()))
+        channel_->enableWriting();
+    }
+    else 
+    {
+      if(channel_->isEnableWriting())
+        channel_->unableWriting();
+    }
   }
 }

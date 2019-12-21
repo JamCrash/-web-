@@ -66,6 +66,18 @@ namespace Sockets
       return -1;
     }
 
+    int optval = 1;
+    if(setsockopt(listenFd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0)
+    {
+      perror("set address reuseful failed");
+      abort();
+    }
+    if(setsockopt(listenFd, SOL_SOCKET, SO_REUSEPORT, &optval, sizeof(optval)) < 0)
+    {
+      perror("set port reuseful failed");
+      abort();
+    }
+
     return listenFd;
   }
 

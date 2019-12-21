@@ -25,7 +25,9 @@ namespace net
     void setCloseCallBack(const EventCallBack& cb) { closeCallBack_ = cb; }
 
     void enableReading() { events_ |= readEvents_; update(); }
+    void unableReading() { events_ &= ~readEvents_; update(); }
     void enableWriting() { events_ |= writeEvents_; update(); }
+    void unableWriting() { events_ &= ~writeEvents_; update(); }
     void setNonEvent() { events_ = nonEvent_; update(); }
     bool isEnableReading() const { return events_ & readEvents_; }
     bool isEnableWriting() const { return events_ & writeEvents_; }

@@ -1,7 +1,8 @@
 
 #ReactorPath := ../../net/
 Reactor := ../../net/EventLoop.o ../../net/EPoller.o ../../net/Channel.o	\
-					../../base/Thread.o
+					../../net/EventLoopThreadPool.o ../../net/EventLoopThread.o \
+					../../base/Thread.o 
 
 Http := ../HttpConnection.o ../HttpData.o ../HttpServer.o
 

@@ -64,6 +64,9 @@ namespace Http
       {
         // 连接成功建立但读不到数据,可能是网络拥塞或对端关闭了连接
         // 统一按照关闭连接处理
+        LOG << "connection establish but no data transmit";
+        connection_->updateRead(false);
+        connection_->updateWrite(false);
         connection_->handleClose();
         break;
       }
@@ -120,7 +123,8 @@ namespace Http
 
     if(!error_ && writeBuffer_.size() > 0)
     {
-      connection_->updateWrite();
+      connection_->updateRead(false);
+      connection_->updateWrite(true);
     }
   }
 
@@ -131,15 +135,19 @@ namespace Http
     {
       perror("write socket error");
       error_ = true;
+      connection_->updateRead(false);
+      connection_->updateWrite(false);
       connection_->handleClose();
     }
     else if(writeBuffer_.empty())
     {
+      connection_->updateRead(false);
+      connection_->updateWrite(false);
       connection_->handleClose();
     }
     else 
     {
-      connection_->updateWrite();
+      //connection_->updateWrite();
     }
   }
 
@@ -164,6 +172,8 @@ namespace Http
     Utility::writen(sockFd_, header_buff);
     Utility::writen(sockFd_, body_buff);
 
+    connection_->updateRead(false);
+    connection_->updateWrite(false);
     connection_->handleClose();
   }
 

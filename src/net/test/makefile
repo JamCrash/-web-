@@ -13,6 +13,14 @@ testReactor: testReactor.cpp $(Reactor) \
 						../../base/Thread.o
 	g++ $^ -lpthread -o $@
 
+testEventLoopThread: testEventLoopThread.cpp $(Reactor) ../EventLoopThread.o \
+						../../base/Thread.o 
+	g++ $^ -lpthread -o $@
+
+testEventLoopThreadPool: testEventLoopThreadPool.cpp $(Reactor)	\
+						../EventLoopThread.o ../EventLoopThreadPool.o ../../base/Thread.o
+	g++ $^ -lpthread -o $@
+
 server: server.cpp $(Reactor)	\
 				../../base/Thread.o
 	g++ $^ -lpthread -o $@
