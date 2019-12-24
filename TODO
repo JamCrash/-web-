@@ -1,6 +1,8 @@
 
 epoll边沿触发
 epoller updateChannel
-Channel.h  channel update 能否借用runInLoop实现在不同线程下的update?
 HttpConnection.cpp line:25 
 处理HTTPDATA读操作时一次读不满的情况
+http连接非阻塞时的结束符?
+HttpConnection关闭时代码写的优雅一点
+
